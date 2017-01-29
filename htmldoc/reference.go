@@ -1,6 +1,7 @@
 package htmldoc
 
 import (
+	"fmt"
 	"golang.org/x/net/html"
 	"net/url"
 	"path"
@@ -87,6 +88,28 @@ func (ref *Reference) RefSitePath() string {
 		return ref.URL.Path
 	}
 	return path.Join(ref.Document.BasePath, ref.URL.Path)
+}
+
+// Render: Provide a visual representation of the reference. This is present as
+// net/html does not have a method of obtaining the source of the html node. The
+// ordering of the attributes between the string of the source node and rendered
+// output of the reference is maintained.
+func (ref *Reference) Render() string {
+	if ref.Node == nil {
+		return ""
+	}
+
+	// Build the attr section (x=y &c)
+	var attrLines string
+	for _, attr := range ref.Node.Attr {
+		attrLines += fmt.Sprintf("%v=%v ", attr.Key, attr.Val)
+	}
+
+	// Trim trailing empty space
+	attrLines = attrLines[:len(attrLines)-1]
+
+	// Build the string and return
+	return fmt.Sprintf("<%v %v>", ref.Node.Data, attrLines)
 }
 
 // URLStripQueryString : Utility function to remove query string from given

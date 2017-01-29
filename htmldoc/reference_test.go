@@ -118,6 +118,23 @@ func TestReferenceAbsolutePath(t *testing.T) {
 	assert.Equals(t, "internal relative reference", ref.RefSitePath(), "directory/subdir/zzy/uup.jjr")
 }
 
+func TestReferenceRender(t *testing.T) {
+	snip := "<img src=\"x\" alt=\"y\" />"
+	rendered := "<img src=x alt=y>"
+
+	nodeDoc, nodeElem := nodeGen(snip)
+
+	doc := Document{
+		SitePath: "doc.html",
+		htmlNode: nodeDoc,
+	}
+
+	var ref *Reference
+
+	ref = NewReference(&doc, nodeElem, "http://test.com")
+	assert.Equals(t, "reference render", ref.Render(), rendered)
+}
+
 func TestURLStripQueryString(t *testing.T) {
 	original := "https://github.com/wjdp/gotdict/issues/new?title=Harwood Fell&body=[_definitions/harwood-fell.mdd](https://github.com/wjdp/gotdict/blob/master/_definitions/harwood-fell.mdd)"
 	actual := URLStripQueryString(original)
