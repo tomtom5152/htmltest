@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 	"crypto/tls"
+	"os"
 )
 
 // HTMLTest struct, A html testing session, user options are passed in and
@@ -68,6 +69,19 @@ func Test(optsUser map[string]interface{}) *HTMLTest {
 
 	if hT.opts.NoRun {
 		return &hT
+	}
+
+	// Check the provided DirectoryPath exists
+	f, err := os.Open(hT.opts.DirectoryPath)
+	if os.IsNotExist(err) {
+		output.AbortWith("Cannot access '" + hT.opts.DirectoryPath + "', no such directory.")
+	}
+	// Get FileInfo, (scan for details)
+	fi, err := f.Stat()
+	output.CheckErrorPanic(err)
+	// Check if directory
+	if !fi.IsDir() {
+		output.AbortWith("DirectoryIndex '" + hT.opts.DirectoryPath + "' is a file, not a directory.")
 	}
 
 	// Init our document store
